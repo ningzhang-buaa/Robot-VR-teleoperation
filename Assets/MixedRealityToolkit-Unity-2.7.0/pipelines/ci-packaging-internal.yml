@@ -1,0 +1,25 @@
+# CI build producing developer packages.
+
+variables:
+- template: config/settings.yml
+
+jobs:
+- job: CodeValidation
+  pool:
+    vmImage: windows-2019
+  steps:
+  - template: templates/validation.yml
+
+- job: UnityValidation
+  timeoutInMinutes: 90
+  pool:
+    name: Analog N-1
+    demands:
+    - ${{ variables.Unity2018VersionInternal }}
+    - COG-UnityCache-WUS2-01
+    - SDK_18362 -equals TRUE
+  steps:
+  - template: templates/ci-common.yml
+    parameters:
+      publishPackagesToFeed: true
+      UnityVersion: $(Unity2018VersionInternal)
